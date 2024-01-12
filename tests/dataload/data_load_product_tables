@@ -1,0 +1,223 @@
+from openpyxl import load_workbook
+import re
+import logging
+from operator import truediv
+import psycopg2
+from string import Template
+import uuid
+import psycopg2.extras
+from itertools import zip_longest
+import io
+import datetime
+ 
+from data_load_utils import DataLoadUtils
+from data_load_config import Configuration
+from data_load_logging import Logger
+
+class DataLoadProductTables:
+    def __init__(self):
+        self.logger = Logger.build_logger()
+        self.configure = Configuration()
+        self.utils = DataLoadUtils()
+    
+    def finding_store_id(self, store_name):
+        
+        conn = self.utils.connection()
+        cur = conn.cursor()
+        
+        dml_query="select store_id from buyrite.store where store_name = %s;"
+        
+        cur.execute(dml_query, (store_name,))
+        row = cur.fetchall()
+
+        return (row[0][0])
+
+    def generate_product_table(self):
+
+        item_unique = set()
+        product_table_dml=[]
+
+        beer_markup_percentage = self.configure.beer_markup_percentage
+        wine_markup_percentage = self.configure.wine_markup_percentage
+        liquour_markup_percentage = self.configure.liquour_markup_percentage
+
+        
+        DML_BASE_PATH = self.configure.DML_BASE_PATH
+
+        EXCEL_FILE = self.configure.EXCEL_FILE
+        store_name = self.configure.STORE_NAME
+
+        excel_sheets  = load_workbook(EXCEL_FILE)
+        sheets = excel_sheets.sheetnames
+        
+        self.logger.info("excel loaded")
+        
+        store_id = self.finding_store_id(store_name)
+        self.logger.info("store_name is [%s] and store_id is [%s]",store_name,store_id)
+
+        for sheet in sheets:
+            self.logger.info(sheet)
+            sheet = excel_sheets[sheet]
+
+            for value in sheet.iter_rows(min_row=2,max_row=sheet.max_row,min_col=1,max_col=sheet.max_column,values_only=True):
+                
+                #parsing for product table
+                if value[1] not in item_unique:
+
+                    description = value [2].replace("'" , "")
+                    item = value[1]
+                    item_unique.add(item)
+                    
+                    #if vintage has year then consider it as wine
+                    vintage = value[3]
+                    if(vintage != None):
+                        product_type = "wine"
+                        unit_markup = wine_markup_percentage
+                    else:
+                        product_type = None
+                    
+                    value_before_PK = (re.findall(r"(\d+)PK",description))
+                    #if PK is not present consider it as 1
+
+                    if(value_before_PK == []):
+                        sale_unit = 1
+                    else:
+                        sale_unit = value_before_PK[0]
+                        product_type = "beer"
+                        unit_markup = beer_markup_percentage
+
+                    if product_type == None:
+                        product_type = "liquour"
+                        unit_markup = liquour_markup_percentage
+
+                    size_per_case= value [4]
+
+                    unit_size = ""
+                    if type(size_per_case) != datetime.datetime:
+                        size =  size_per_case.split("/")[:-1]
+                        for i in size: unit_size = unit_size + i
+                        case =  int(size_per_case.split("/")[-1])
+                    else:
+                        unit_size =  size_per_case
+                        case =  1
+
+                    carton_price = value[5]
+
+                    #if sold as carton true , else false
+                    sold_as_carton = []
+                    if(carton_price > 0):
+                        sold_as_carton = 1
+                    else:
+                        sold_as_carton = 0
+
+                    units_in_carton = int(case) / int(sale_unit)
+                    unit_price = carton_price / int(sale_unit)
+                    sale_price = unit_price * unit_markup
+
+                    last_updated_by = "abc"
+
+                    
+                    str = ("insert into buyrite.product (product_guid , store_id, item , description , type , unit_price ,unit_markup ,sale_price, units_in_carton , carton_price ,sold_as_carton, sale_unit, unit_size, last_updated_date , last_updated_by) "+
+                        "select '$product_guid', '$store_id', '$item' , '$description' , '$type' , '$unit_price' ,'$unit_markup' , '$sale_price' ,'$units_in_carton' ,'$carton_price' ,'$sold_as_carton' ,'$sale_unit' , '$unit_size' , CURRENT_DATE , '$last_updated_by';")
+                    str_obj = Template(str)
+                    
+                    product_table_dml_stmt = str_obj.substitute(product_guid = self.utils.new_guid() , store_id = store_id, item = item , description = description , 
+                        type = product_type , unit_price = unit_price ,unit_markup = unit_markup, sale_price = sale_price, units_in_carton = units_in_carton , carton_price = carton_price,
+                        sold_as_carton = sold_as_carton ,sale_unit = sale_unit,unit_size = unit_size , last_updated_by = last_updated_by )
+
+                    product_table_dml.append(product_table_dml_stmt)
+
+                #end of parsing for product table
+
+        #inserting data into product table
+        product_table_file = DML_BASE_PATH + "04-product.sql"
+        self.utils.write_dml_stmts_file(product_table_file , product_table_dml)
+        
+        logging.info("Writing product dml [%s] with [%s] records",product_table_file,len(product_table_dml))
+        
+        self.utils.save_db_list(product_table_dml,5000)
+
+
+    def set_up(self):
+        global_product_id_dict = {}
+        conn = self.utils.connection()
+        cur = conn.cursor()
+        dml_query="select product_id , item from buyrite.product;"
+        cur.execute(dml_query) 
+        rows = cur.fetchall()
+
+        for row in rows:
+            global_product_id_dict[row[1]] = row[0]
+
+        return global_product_id_dict
+
+    def generate_product_sales_table(self):
+
+        store_name = self.configure.STORE_NAME
+
+        store_id = self.finding_store_id(store_name)
+        self.logger.info("store_name is [%s] and store_id is [%s]",store_name,store_id)
+
+        global_product_id_dict = self.set_up()
+        product_sales_table_dml = []
+
+        DML_BASE_PATH = self.configure.DML_BASE_PATH
+
+        EXCEL_FILE = self.configure.EXCEL_FILE
+
+        excel_sheets  = load_workbook(EXCEL_FILE)
+        sheets = excel_sheets.sheetnames
+        
+        self.logger.info("excel loaded")
+        
+        for sheet in sheets:
+            self.logger.info(sheet)
+            sheet = excel_sheets[sheet]
+            alldates=[]
+            dates = {}
+
+            for rows in sheet.iter_rows(min_row = 1 ,max_row= 1,min_col= 8,max_col=sheet.max_column-1,values_only=True):
+
+                for row in rows :
+                    sales_end_date = row
+                    sales_from_date = sales_end_date - datetime.timedelta(days=7)
+                    dates ={"sales_from_date" : sales_from_date ,
+                                "sales_end_date" : sales_end_date}
+                    alldates.append(dates)
+
+            for value in sheet.iter_rows(min_row=2,max_row=sheet.max_row,min_col=1,max_col=sheet.max_column,values_only=True):
+
+                #parsing for product_sales table
+                product_id = global_product_id_dict [value[1]]
+                
+                start_column = 7
+                for dates in alldates:
+                    sales_from_date = dates['sales_from_date']
+                    sales_end_date = dates['sales_end_date']
+                    
+                    units_sold = value[start_column]
+                    start_column = start_column + 1
+                    
+                    units_discount_price = 0
+
+                    str = ("insert into buyrite.product_sales (product_sales_guid , product_id , store_id, sales_from_date , sales_end_date , units_sold , units_discount_price ) "+
+                        "select '$product_sales_guid','$product_id' ,'$store_id', '$sales_from_date' , '$sales_end_date' , '$units_sold' , '$unit_discount_price' ;")
+                    str_obj = Template(str)
+                    
+                    product_sales_table_dml_stmt = str_obj.substitute(product_sales_guid = self.utils.new_guid() ,product_id = product_id , store_id = store_id, sales_from_date = sales_from_date , sales_end_date = sales_end_date ,  units_sold = units_sold , unit_discount_price = units_discount_price)
+                    
+                    product_sales_table_dml.append(product_sales_table_dml_stmt)
+
+                #end of parsing for product_sales table
+
+        #inserting data into product_sales table
+        product_sales_table_file = DML_BASE_PATH + "05-product_sales.sql"
+        self.utils.write_dml_stmts_file(product_sales_table_file , product_sales_table_dml)
+        
+        self.logger.info("Writing product_sales dml [%s] with [%s] records",product_sales_table_file,len(product_sales_table_dml))
+        
+        self.utils.save_db_list(product_sales_table_dml,50000)
+
+if __name__=="__main__":
+    DataLoadProductTables().generate_product_table()
+    DataLoadProductTables().generate_product_sales_table()

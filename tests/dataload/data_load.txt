@@ -1,0 +1,26 @@
+# LOAD DATA INTO DATA TABLES
+GIT - https://bitbucket.org/MettleAdmin/buyriteapi/src/main/
+
+
+# clone your repository
+
+
+# create datebase using the file buyriteapi/db/00-datebase.sql 
+# create user using the file buyriteapi/db/01-user.sql 
+# create schema using the file buyriteapi/db/02-schema.sql 
+
+
+# create product table using file buyriteapi/db/ddl/04-table.product.sql 
+# create product_sales table using file buyriteapi/db/ddl/05-table.product_sales.sql
+
+# change the location for the access of the excel in the file buyriteapi/tests/dataload/data_load_config.py
+
+In that file change the location in the variable " DATA_FILE_LOCATION " as per your system
+
+# run below file to insert data into data table
+# run file buyriteapi/tests/dataload/data_load_product_tables.py
+
+In this data_load_product_tables.py file, 
+There are two functions 
+    generate_product_table - for loading the product table
+    generate_product_sales_table - for loading the product_sales table 

@@ -1,0 +1,2 @@
+insert into buyrite.vendor (vendor_guid ,code, name , address , phone_number , sales_representative ,  sales_contact_phone_number, sales_contact_email, procurement_email , last_updated_date, last_updated_by )
+select '5d3a2714-9d27-4fca-a6bb-1333fe1e1acb', '5d3a2714-9d27-4fca-a6bb-1333fe1e1abb','xyz','abc',567-789-7654, 'pqr' , 987-987-0987 , 'pqr@gmail.com' , 'utr@gmail.com', CURRENT_DATE , CURRENT_DATE;

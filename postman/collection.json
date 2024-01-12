@@ -1,0 +1,649 @@
+{
+	"info": {
+		"_postman_id": "1b3a9960-4ee3-42d7-b325-adb00d5bb031",
+		"name": "buyrite",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "store",
+			"item": [
+				{
+					"name": "get-stores",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{buyrite-token-bearer}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{buyrite-serverless}}/stores",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"stores"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-stores-full-detail",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{buyrite-token-bearer}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{buyrite-serverless}}/stores-with-store-users",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"stores-with-store-users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "insert-store",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{buyrite-token-bearer}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"location\": \"1-2 xyzz\",\r\n    \"owner\": \"abcc\",\r\n    \"rent\": \"123.500000\",\r\n    \"rent_payment_window\": \"12\",\r\n    \"type\": \"own\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{buyrite-serverless}}/store",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"store"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-store",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{buyrite-token-bearer}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"6dbab4b2-d208-4878-a24d-fa3a55332a43\",\r\n    \"location\": \"1 xyzz\",\r\n    \"owner\": \"abcc\",\r\n    \"rent\": \"123.500000\",\r\n    \"rent_payment_window\": \"1\",\r\n    \"type\": \"own\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{buyrite-serverless}}/store",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"store"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-store-by-id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{buyrite-token-bearer}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{buyrite-serverless}}/store/{{store-id}}",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"store",
+								"{{store-id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "store-users-by-store-guid",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{buyrite-token-bearer}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{buyrite-serverless}}/store/{{store-id}}/store-users",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"store",
+								"{{store-id}}",
+								"store-users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "store-user",
+			"item": [
+				{
+					"name": "store-user-by-store-user-guid",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{buyrite-serverless}}/store/store-user/{{store-user-id}}",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"store",
+								"store-user",
+								"{{store-user-id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "all-store-users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{buyrite-serverless}}/store-users",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"store-users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "vendor",
+			"item": [
+				{
+					"name": "get-vendors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{buyrite-serverless}}/vendors",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"vendors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-vendor-by-id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{buyrite-serverless}}/vendor/{{vendor-id}}",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"vendor",
+								"{{vendor-id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "product",
+			"item": [
+				{
+					"name": "get-products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{buyrite-serverless}}/products",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-products-with-product-sales",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{buyrite-serverless}}/products-with-product-sales",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"products-with-product-sales"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-product-by-id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{buyrite-serverless}}/product/{{product-id}}",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"product",
+								"{{product-id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-product-by-id-with-product-sales",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{buyrite-serverless}}/product/{{product-id}}/product-sales",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"product",
+								"{{product-id}}",
+								"product-sales"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "product sales",
+			"item": [
+				{
+					"name": "get-product-sales",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{buyrite-serverless}}/product-sales",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"product-sales"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-product-sales-by-id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{buyrite-serverless}}/product-sales/{{product-sales-id}}",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"product-sales",
+								"{{product-sales-id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "home-page",
+			"item": [
+				{
+					"name": "home-screen-graph",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{buyrite-serverless}}/home-page-graph?store-id=5d3a2714-9d27-4fca-a6bb-1333fe1e1acc",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"home-page-graph"
+							],
+							"query": [
+								{
+									"key": "store-id",
+									"value": "5d3a2714-9d27-4fca-a6bb-1333fe1e1acc"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "analysis",
+			"item": [
+				{
+					"name": "get-product-analysis",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{buyrite-serverless}}/analysis?limit=25&offset=0&store_id=5d3a2714-9d27-4fca-a6bb-1333fe1e1acc&product_type=beer&product_id=f00c2407-ac1d-462b-aa7e-8bdffaa59b48",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"analysis"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "25"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "store_id",
+									"value": "5d3a2714-9d27-4fca-a6bb-1333fe1e1acc"
+								},
+								{
+									"key": "product_type",
+									"value": "beer"
+								},
+								{
+									"key": "product_id",
+									"value": "f00c2407-ac1d-462b-aa7e-8bdffaa59b48"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "login",
+			"item": [
+				{
+					"name": "do-login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setGlobalVariable(\"buyrite-token-bearer\", jsonData.access_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"email\": \"vignesh@corpworx.com\",\r\n\t\"password\": \"Password@123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{buyrite-serverless}}/login",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setGlobalVariable(\"token-bearer\", jsonData.access_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{buyrite-token-bearer}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"email\": \"vignesh@corpworx.com\",\r\n\t\"password\": \"Password@123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{buyrite-serverless}}/logout",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "options",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{buyrite-token-bearer}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "OPTIONS",
+						"header": [],
+						"url": {
+							"raw": "{{buyrite-serverless}}/login",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "buyrite-users",
+			"item": [
+				{
+					"name": "me",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{buyrite-token-bearer}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token-bearer}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"email\": \"vignesh@corpworx.com\",\r\n\t\"password\": \"Password@123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{buyrite-serverless}}/buyriteusers/me",
+							"host": [
+								"{{buyrite-serverless}}"
+							],
+							"path": [
+								"buyriteusers",
+								"me"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
